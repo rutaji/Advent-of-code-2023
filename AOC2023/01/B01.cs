@@ -12,45 +12,35 @@ namespace AOC2023._01
         public static int start()
         {
 
+            string[] paterns = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine","[1-9]" };
             int sum = 0;
             foreach (string Line in File.ReadLines(Path.Combine(Environment.CurrentDirectory, @"..\..\..", @"01\InputA01.txt")))
             {
-                var Matches = Regex.Matches(Line, "one|four|five|six|seven|[0-9]");
-                var BonusMatches = Regex.Matches(Line, "nine|two|three"); 
-                var EightMatches = Regex.Matches(Line, "eight");
-
-                string firstValue = Matches.First().Value;
-                string LastValue;
-
-                if (Matches.Count != 0)
+                int firstIndex = int.MaxValue;
+                int lastIndex = int.MinValue;
+                string? firstValue = null;
+                string? lastValue = null;
+                foreach (string p in paterns)
                 {
-                    LastValue = Matches.Last().Value;
-                    if (BonusMatches.Count != 0)
+
+                    var Matches = Regex.Matches(Line,p);
+                    if(Matches.Count > 0) 
                     {
-                        LastValue = Matches.Last().Index > BonusMatches.Last().Index ? Matches.Last().Value : BonusMatches.Last().Value;
-                    }
-                    if (EightMatches.Count != 0)
-                    {
-                        LastValue = Matches.Last().Index > EightMatches.Last().Index ? Matches.Last().Value : EightMatches.Last().Value;
-                    }
-                }
-                else 
-                {
-                    if(BonusMatches.Count != 0) 
-                    {
-                        LastValue = BonusMatches.Last().Value;
-                        if (EightMatches.Count != 0)
+                        if(Matches.First().Index < firstIndex) 
                         {
-                            LastValue = BonusMatches.Last().Index > EightMatches.Last().Index ? BonusMatches.Last().Value : EightMatches.Last().Value;
+                            firstValue = Matches.First().Value;
+                            firstIndex = Matches.First().Index;
+                        }
+                        if (Matches.Last().Index > lastIndex)
+                        {
+                            lastValue = Matches.Last().Value;
+                            lastIndex = Matches.Last().Index;
                         }
                     }
-                    else 
-                    {
-                        LastValue = EightMatches.Last().Value;
-                    }
                 }
+                if( firstValue == null || lastValue == null ) { throw new Exception("no number on line"); }
 
-                int Toadd = int.Parse(GetNumber(firstValue) + GetNumber(LastValue));
+                int Toadd = int.Parse(GetNumber(firstValue) + GetNumber(lastValue));
                 sum += Toadd;
 
             }
